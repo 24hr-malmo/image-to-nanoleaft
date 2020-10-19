@@ -22,8 +22,8 @@ const init = (options) => {
                 const json = JSON.parse(text);
                 return json;
             } catch (err) {
-                console.log(err);
-                console.log('text', text);
+                // console.log(err);
+                //console.log('text', text);
                 return text;
             }
 
