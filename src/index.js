@@ -131,7 +131,7 @@ exports.draw = async (options, imageSource) => {
         y = Math.floor(position / image.bitmap.width);
         const result = matrixControl.setColor(x, y, red, green, blue);
 
-        // await wait(100);
+        await wait(50);
 
 
     }
