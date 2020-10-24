@@ -24,7 +24,8 @@ const createMatrixControl = (options) => {
     let maxY = 0;
 
     let debug = [];
-
+    let buffer = [];
+    let useBuffer = options.buffer;
 
     matrixRows.forEach((row, y) => {
         const items = row.split(' ');
@@ -37,6 +38,10 @@ const createMatrixControl = (options) => {
             matrixControlList[`${x},${y}`] = async (r, g, b) => {
                 if (calibrationColor) {
                     [r,g,b] = calibrationColor.split(',');
+                }
+                if (useBuffer) {
+                    buffer.push({clientId, panelId, r, g, b});
+                    return;
                 }
                 return await clients[clientId].setPanelColor(panelId, r, g, b);
             };
@@ -62,12 +67,26 @@ const createMatrixControl = (options) => {
         setColor: async (x, y, r, g, b) => {
             try {
                 await matrixControlList[`${x},${y}`](r, g, b);
-                console.log('\tOK', x, y, r, g, b);
+                if (!useBuffer) {
+                    console.log('\tOK', x, y, r, g, b);
+                }
             } catch (err) {
                 console.log('\tError with', x, y, err.code);
             }
         },
         controllers: clients,
+        render: async () => {
+            const panels = buffer.reduce((all, panel) => {
+                all[panel.clientId] = all[panel.clientId] || [];
+                all[panel.clientId].push(panel);
+                return all;
+            }, {});
+            const all = Object.entries(panels).map(([clientId, panelData]) => {
+                return clients[clientId].setPanelColor(panelData);
+            });
+            buffer = [];
+            return Promise.all(all);
+        }
     };
 
 };
@@ -107,6 +126,8 @@ exports.getTokens = async (options) => {
 
 };
 
+exports.useBuffer
+
 
 exports.draw = async (options, imageSource) => {
 
@@ -131,10 +152,9 @@ exports.draw = async (options, imageSource) => {
         y = Math.floor(position / image.bitmap.width);
         const result = matrixControl.setColor(x, y, red, green, blue);
 
-        await wait(50);
-
-
     }
+
+    return matrixControl;
 
     //     image
     //     // .resize(2, matrixControl.width, matrixControl.height)
