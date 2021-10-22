@@ -43,6 +43,7 @@ const createMatrixControl = (options) => {
                     buffer.push({clientId, panelId, r, g, b});
                     return;
                 }
+                await wait(50);
                 return await clients[clientId].setPanelColor(panelId, r, g, b);
             };
         });
@@ -150,7 +151,7 @@ exports.draw = async (options, imageSource) => {
 
         x = position % image.bitmap.width;
         y = Math.floor(position / image.bitmap.width);
-        const result = matrixControl.setColor(x, y, red, green, blue);
+        const result = await matrixControl.setColor(x, y, red, green, blue);
 
     }
 

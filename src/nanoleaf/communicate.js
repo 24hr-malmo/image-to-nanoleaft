@@ -22,8 +22,11 @@ const init = (options) => {
                 const json = JSON.parse(text);
                 return json;
             } catch (err) {
-                // console.log(err);
-                //console.log('text', text);
+                console.log('fullUrl', fullUrl);
+                // console.log('err', err);
+                console.log('status', result.status);
+                console.log('data', data);
+                console.log('text', text);
                 return text;
             }
 
